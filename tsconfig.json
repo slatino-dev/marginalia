@@ -19,6 +19,6 @@
     "noEmit": true
   },
   "// note": "vitest.config.ts + scripts/ are Node tooling (node:fs etc.) validated by their own runtimes, not this Workers-typed program; @types/node is deliberately absent so Node globals never leak into the Worker source.",
-  "include": ["src", "test", "analytics", "drizzle.config.ts"],
+  "include": ["src", "test", "analytics", "evals", "drizzle.config.ts"],
   "exclude": ["node_modules", ".wrangler"]
 }

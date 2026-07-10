@@ -18,6 +18,7 @@
     "migrate": "wrangler d1 migrations apply marginalia --local",
     "build:css": "tailwindcss -i src/styles/theme.css -o public/tokens.css",
     "check:contrast": "node scripts/check-contrast.mjs",
+    "ingest": "tsx scripts/ingest.ts",
     "cf-typegen": "wrangler types",
     "deploy": "wrangler deploy"
   },
