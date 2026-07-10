@@ -30,13 +30,14 @@ investment advice.
 
 ## Sizing gate (decided from MEASURED counts at ingest)
 
-The embedding model is chosen from the measured chunk count, not an estimate
-(ARCHITECTURE "Free-allocation math"): prefer bge-m3 (1024d) if the measured chunk count
-is <= 4,400 (90% of the 5M-stored-dim / 1024d Vectorize cap); else bge-base-en-v1.5
-(768d). Planning estimate only (unverified): ~1,000-1,100 pages -> ~1,900 chunks at ~400
-tokens, central case, with ~4,400 as the worst-case bound. **If the dense lane moves off
-Vectorize to the $0 cosine alternative (pending Sam's decision), the 5M-stored-dim cap no
-longer binds and the sizing gate is only about embed-rate and quality, not the vector cap.**
+The embedding model is chosen from the measured chunk count and quality, not an estimate.
+**Decision 2026-07-10: the dense lane is $0 brute-force cosine over D1-stored embeddings
+(not Vectorize — paid-gated; see ARCHITECTURE), so the 5M-stored-dim Vectorize cap NO
+LONGER binds corpus size.** The sizing gate is now only about embed rate (neurons) and
+retrieval quality: prefer bge-m3 (1024d, best quality, cheapest embed rate) unless the
+measured neuron cost or dimension pushes back. Planning estimate only (unverified):
+~1,000-1,100 pages -> ~1,900 chunks at ~400 tokens, central case, ~4,400 worst-case bound;
+the cosine scan cost scales linearly and stays within budget at either (benchmarked).
 
 ## Ingest invariants (recorded here, enforced in code at Phase 1)
 

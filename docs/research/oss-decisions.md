@@ -27,12 +27,17 @@
 
 ## Notes / flags
 
-- **Vectorize (dense lane) is under a platform review** — the Cloudflare pricing page now
-  gates Vectorize behind the Workers **Paid** plan (read 2026-07-10; recorded in
-  `ARCHITECTURE.md`). This collides with the $0 posture. The dense lane sits behind a
-  `VectorizeIndex` port, so a $0 alternative (brute-force cosine over embeddings stored in
-  D1 / a DO) is a localized swap. Decision pending (raised to Sam). No Vectorize
-  dependency is committed until that resolves.
+- **Vectorize (dense lane) — RESOLVED 2026-07-10: NOT adopted; dense lane is $0
+  brute-force cosine.** The Cloudflare pricing page now gates Vectorize behind the Workers
+  **Paid** plan ("Vectorize is currently only available on the Workers paid plan", read
+  2026-07-10), which collides with the hard $0/free-tier posture (PORTFOLIO-V2). Decision
+  (team-lead-approved): implement the dense lane as brute-force cosine over corpus
+  embeddings stored in D1 (resident in the budget DO), behind the `DenseIndex` port
+  (`src/retrieval/dense.ts`) so a future Vectorize/ANN backend is a drop-in. Measured this
+  session (`scripts/bench-dense.ts`, Node): ~1.15 ms/sub-query, ~3.4 ms for a 3-sub-query
+  agentic question at 1,900 x 1024 — within the 10ms budget. No Vectorize dependency is in
+  the tree. Integration mode had it been used would have been `service` (managed CF
+  product); the $0 path is first-party code, no third-party license involved.
 - Corpus documents (the Postmortem Library) are US-government public domain under
   17 U.S.C. 105, not a software dependency; their provenance + sha256 are in
   `docs/corpus-dossier.md`. Attribution to the issuing body is preserved per the NOTICE.

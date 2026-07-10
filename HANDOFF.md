@@ -56,15 +56,19 @@
   `slatino-dev/marginalia`, so the CI deploy job skips (green). Today's live deploy was done
   locally with authed wrangler. Add the secret (Workers Scripts:Edit + D1:Edit) to enable
   deploy-on-main. The gh token in this session lacks secrets-write scope, so this is Sam's action.
-- **R2 — RESOLVED 2026-07-10 (team lead, per Sam's standing $0 posture): option (b).**
-  Vectorize is Workers-Paid-gated (pricing page read 2026-07-10; recorded in ARCHITECTURE),
-  so the dense lane is brute-force cosine over embeddings stored in D1, computed in a DO,
-  implemented BEHIND the existing `VectorizeIndex` port so an ANN backend stays a drop-in.
-  Requirements attached to the swap: record the decision in ARCHITECTURE.md +
-  docs/research/oss-decisions.md, and produce a MEASURED CPU-time figure for a full dense
-  query at the real corpus size (the 10ms claim needs a number, not an estimate).
-  Portfolio-wide override recorded in `projects\PORTFOLIO-V2.md`: no app takes a Vectorize
-  dependency. No Vectorize dependency is committed.
+- **R2 — RESOLVED + IMPLEMENTED 2026-07-10 (team-lead-approved option b).** Vectorize is
+  Workers-Paid-gated (pricing page read 2026-07-10), so the dense lane is $0 brute-force
+  cosine over D1-stored embeddings, resident in the agent-loop DO, implemented behind the
+  `DenseIndex` port (`src/retrieval/dense.ts`) so a Vectorize/ANN backend stays a drop-in.
+  Delivered this session: the port + `CosineIndex` (pure, tested, `test/dense.test.ts`, 7
+  tests) + a Node benchmark (`scripts/bench-dense.ts`). MEASURED figure this session
+  (Node = identical V8 float math; workerd coarsens `performance.now()` so it cannot be
+  timed in-runtime): a full top-8 cosine scan over 1,900 x 1024 is ~1.15 ms/sub-query and
+  ~3.4 ms for a 3-sub-query agentic question, under the 10ms Worker CPU budget (and it runs
+  in the DO, on DO duration not Worker CPU). Recorded in ARCHITECTURE.md (Free-tier limits
+  + Stack commitments), docs/research/oss-decisions.md, docs/corpus-dossier.md. What remains
+  (Phase 1 continuation): wire real embeddings from ingest into D1 and load them into the DO.
+  Portfolio-wide override is the team lead's to record in PORTFOLIO-V2.md (I did not edit it).
 - **R3 — dependency audit** finds high-severity advisories in transitive dev deps
   (`npm audit`); the CI audit step is `continue-on-error` (matches conduit). Not triaged this
   session; review before launch.
@@ -76,8 +80,9 @@
 1. Fill `docs/corpus-dossier.md` with pinned URLs + real sha256s + measured page counts
    (fetch each PDF once), then implement extraction + structure-aware chunking in the ingest
    pipeline; measure the chunk count and run the embedding-model sizing gate.
-2. Implement the R2-resolved dense lane (D1-stored embeddings + DO cosine behind the
-   `VectorizeIndex` port) so the embed/upsert stage can be written; measure query CPU time.
+2. Wire the R2-resolved dense lane to real data: an `embeddings` D1 table + upsert in the
+   ingest pipeline, and load them into the agent-loop DO to back `CosineIndex` (the port +
+   cosine backend + benchmark already exist in `src/retrieval/dense.ts`).
 3. Grow the golden set from 20 to >= 60 (question text + notes only); label `expectedChunkIds`
    is Phase 3 (ingest-gated).
 4. [SECURITY/Opus] admin/ingest auth surface + append-only `admin_audit` writes on ingest runs.
