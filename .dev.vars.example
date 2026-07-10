@@ -1,0 +1,16 @@
+# Copy to `.dev.vars` for local `wrangler dev`. NEVER commit `.dev.vars`.
+# These are LOCAL-ONLY dev vars. Production secrets live in Worker secrets
+# (`wrangler secret put`), never in wrangler.toml [vars] and never in git.
+
+# ─── Client-id HMAC salt ([SECURITY/Opus] "Client identification" + "Secrets") ─
+# Keyed salt for the non-reversible per-visitor session hash used by the neuron
+# budget's per-visitor cap. In PRODUCTION this is a Worker SECRET
+# (`wrangler secret put HASH_SALT`), NEVER wrangler.toml [vars] and NEVER git.
+# Locally, set any >=16-char random value. Missing salt fails closed.
+HASH_SALT="local-dev-salt-change-me-0123456789"
+
+# ─── Admin credential ([SECURITY/Opus] admin/ingest isolation, Phase 1) ────────
+# argon2id hash of the admin password (server-side session auth for the ingest /
+# eval-management surface). A Worker SECRET in production. Unset here by default;
+# the admin surface is unreachable until this lands in Phase 1.
+# ADMIN_CREDENTIAL_HASH=""

@@ -1,0 +1,84 @@
+name: CI
+
+# Types / lint / unit + migration check on every push and PR, plus a deploy job on
+# main. The deploy job needs a CLOUDFLARE_API_TOKEN repo secret (Workers Scripts:Edit
+# + D1:Edit); it publishes to marginalia.samlatino.dev. Until that secret is added the
+# verify + secret-scan jobs still run and gate every push; deploy is skipped cleanly.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Dependency audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Migration check (apply all migrations to a fresh local D1)
+        run: npx wrangler d1 migrations apply marginalia --local
+
+      - name: Unit tests (vitest-pool-workers / workerd)
+        run: npm test
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Publish to marginalia.samlatino.dev on main only, after verify + secret-scan pass.
+  # Requires the CLOUDFLARE_API_TOKEN repo secret; the job no-ops if it is absent.
+  deploy:
+    needs: [verify, secret-scan]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Deploy (wrangler)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "CLOUDFLARE_API_TOKEN not set — skipping deploy. Add the repo secret to enable."
+            exit 0
+          fi
+          npx wrangler deploy

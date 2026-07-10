@@ -1,0 +1,39 @@
+name = "marginalia"
+main = "src/index.ts"
+compatibility_date = "2024-11-06"
+compatibility_flags = ["nodejs_compat"]
+
+# ─── Publish target ────────────────────────────────────────────────────────────
+# marginalia.samlatino.dev is the intended public address (PORTFOLIO-V2 subdomain
+# table). workers.dev stays OFF so the only public address is the intended one.
+# Phase 0 ships a hello-world Worker (/healthz) + the Signal Path token sheet as a
+# static asset; the /ask path, admin surface, and ingest do NOT exist yet, so the
+# public attack surface is a health probe plus static files. The [SECURITY/Opus]
+# inbound stack, ask-path rate limits, and admin isolation land with those surfaces
+# in Phase 2/3 (BUILD-PLAN), before any model call or write path is exposed.
+workers_dev = false
+
+[[routes]]
+pattern = "marginalia.samlatino.dev"
+custom_domain = true
+
+[observability]
+enabled = true
+
+# ─── Static assets — the Signal Path token sheet (Design Loop proof surface) ────
+# Serves public/ at `/` under both `wrangler dev` and the deployed custom domain.
+# Static-asset requests are free and unlimited on the Workers Free plan
+# (verified 2026-07-10). The React SPA replaces this token sheet in Phase 2.
+[assets]
+directory = "./public"
+
+# ─── Bindings ──────────────────────────────────────────────────────────────────
+# Phase 0 provisions ONLY D1 (the system of record). Vectorize + R2 are deferred to
+# Phase 1 ingest (and Vectorize is under a paid-plan review — see ARCHITECTURE
+# "Free-tier limits"); KV (preset-trace cache) and the BudgetLedger DO land with the
+# retrieval core in Phase 2. Bind only what is used.
+[[d1_databases]]
+binding = "DB"
+database_name = "marginalia"
+database_id = "cb6d63c6-e800-49b0-8308-76e50c1e2c48"
+migrations_dir = "migrations"

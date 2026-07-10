@@ -1,0 +1,20 @@
+Marginalia
+Copyright 2026 Sam Latino
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this project except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+[FLAGGED FOR SAM] The Apache-2.0 license is PROPOSED in the charter (PRD.md),
+pending ratification. It is applied now so the public repo is licensed from day
+one; change it before any external contribution is accepted if Sam decides
+otherwise.
+
+The Postmortem Library corpus consists of U.S. federal accident investigation
+reports that are in the public domain under 17 U.S.C. 105 (works of the U.S.
+Government). Each source, its origin URL, and its sha256 are recorded in
+docs/corpus-dossier.md. This project is not affiliated with, endorsed by, or
+sponsored by any U.S. government agency, commission, or board named in the
+corpus, and it does not provide safety, engineering, or investment advice.

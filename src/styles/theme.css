@@ -1,0 +1,310 @@
+/* ============================================================================
+   theme.css — "Signal Path" design tokens, Marginalia app (Design Loop step 3)
+   Tailwind v4 CSS-first. Three tiers: base (@theme) -> semantic (@theme inline)
+   -> component. OKLCH scales, 11 steps (50-950). Dark-first with a light remap.
+
+   OWNERSHIP (per PORTFOLIO-V2 + DESIGN-BRIEF, 2026-07):
+   - Conduit CREATED the lab-wide Signal Path base. Marginalia (the flagship design
+     piece) RATIFIES/HARDENS that base: the [LAB BASE] block below is copied verbatim
+     from Conduit's base and is the shared reference every sibling inherits. Marginalia
+     does NOT choose a second type pairing — it keeps the ratified Bricolage Grotesque /
+     Geist / Geist Mono lab pairing.
+   - The [MARGINALIA OVERRIDE] block replaces ONLY the accent (Rubric vermilion, hue 40)
+     and adds the annotated-page display-flourish tokens. Siblings swap this block.
+   - When a third sibling pulls this base, extract [LAB BASE] to a shared package; keep
+     the two blocks cleanly separable so that extraction is mechanical.
+
+   Rules: components consume SEMANTIC tokens only. No raw hex, no magic px, no inline
+   durations. Light mode is a token remap, never per-component overrides.
+   ============================================================================ */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   [LAB BASE] — shared across all Signal Path apps (ratified by Marginalia)
+   `static` forces every token to emit even when unused, so the base is a complete,
+   inheritable reference (Tailwind tree-shakes plain `@theme`; a shared base must not).
+   ───────────────────────────────────────────────────────────────────────── */
+@theme static {
+  /* ── Neutral scale — cool slate (hue 240), OLED-friendly dark surfaces ──── */
+  --color-neutral-50:  oklch(0.985 0.003 240);
+  --color-neutral-100: oklch(0.967 0.005 240);
+  --color-neutral-200: oklch(0.925 0.008 240);
+  --color-neutral-300: oklch(0.865 0.010 240);
+  --color-neutral-400: oklch(0.715 0.013 240);
+  --color-neutral-500: oklch(0.585 0.014 240);
+  --color-neutral-600: oklch(0.455 0.014 240);
+  --color-neutral-700: oklch(0.375 0.014 240);
+  --color-neutral-800: oklch(0.290 0.013 240);
+  --color-neutral-900: oklch(0.195 0.011 240);
+  --color-neutral-950: oklch(0.150 0.010 240);
+
+  /* ── Status hues — tuned per mode in the semantic tier below ────────────── */
+  /* success (green 155), warning (amber 75), info (azure 235). Danger is set in the
+     [MARGINALIA OVERRIDE] block: it shifts cooler/darker (hue ~22) so the vermilion
+     accent (hue 40) never reads as failure. Raw ramp anchors; semantic tokens pick. */
+  --color-success-400: oklch(0.800 0.150 155);
+  --color-success-600: oklch(0.515 0.130 155);
+  --color-warning-400: oklch(0.820 0.150 75);
+  --color-warning-600: oklch(0.520 0.125 75);
+  --color-info-400:    oklch(0.780 0.120 235);
+  --color-info-600:    oklch(0.520 0.140 235);
+
+  /* ── Type: ratified lab pairing (faces + licenses recorded in DESIGN.md) ──
+     Display  = Bricolage Grotesque (OFL 1.1) — characterful engineered grotesque
+     Body/UI  = Geist (OFL 1.1)               — neutral infrastructure sans
+     Mono     = Geist Mono (OFL 1.1)          — data readouts, telemetry, anchors
+     Fallbacks are size-adjusted at load (see DESIGN.md loading strategy). */
+  --font-display: "Bricolage Grotesque", "Bricolage Grotesque Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-body:    "Geist", "Geist Fallback", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono:    "Geist Mono", ui-monospace, "SFMono-Regular", "Menlo", monospace;
+  /* Reading-column serif is a Marginalia addition (see override block). */
+
+  /* Type scale (modular ~1.2; tabular-nums enforced on data via component layer) */
+  --text-xs:   0.75rem;  --text-xs--line-height:  1.45;
+  --text-sm:   0.875rem; --text-sm--line-height:  1.5;
+  --text-base: 1rem;     --text-base--line-height: 1.6;
+  --text-lg:   1.125rem; --text-lg--line-height:  1.5;
+  --text-xl:   1.375rem; --text-xl--line-height:  1.35;
+  --text-2xl:  1.75rem;  --text-2xl--line-height: 1.25;
+  --text-3xl:  2.25rem;  --text-3xl--line-height: 1.15;
+  --text-4xl:  3rem;     --text-4xl--line-height: 1.05;
+  --text-5xl:  4rem;     --text-5xl--line-height: 1.0;
+  --tracking-tight: -0.02em;
+  --tracking-label: 0.06em; /* uppercase mono labels / telemetry legends */
+
+  /* ── Spacing base (Tailwind v4 dynamic scale) — 4px rhythm ──────────────── */
+  --spacing: 0.25rem;
+
+  /* ── Radii — ROLE-ASSIGNED, deliberately NOT uniform (anti-slop) ────────── */
+  --radius-none: 0px;
+  --radius-xs:   2px;    /* citation chips, connectors */
+  --radius-sm:   4px;    /* inputs, small controls */
+  --radius-md:   6px;    /* buttons, citation markers */
+  --radius-lg:   10px;   /* cards, panels, audit panel */
+  --radius-xl:   14px;   /* hero surface / reading module */
+  --radius-pill: 9999px; /* status dots, mode pills */
+
+  /* ── Shadows — designed for dark-first (top hairline + real depth). NOT the
+        0.1-opacity default-shadow cliche. ─────────────────────────────────── */
+  --shadow-1: inset 0 1px 0 oklch(1 0 0 / 0.04), 0 1px 2px oklch(0 0 0 / 0.40);
+  --shadow-2: inset 0 1px 0 oklch(1 0 0 / 0.05), 0 4px 14px oklch(0 0 0 / 0.45);
+  --shadow-3: inset 0 1px 0 oklch(1 0 0 / 0.06), 0 14px 36px oklch(0 0 0 / 0.52);
+
+  /* ── Z-index scale ──────────────────────────────────────────────────────── */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-dropdown: 20;
+  --z-sticky: 30;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --z-tooltip: 70;
+
+  /* ── Motion — ALL animation timing comes from here ──────────────────────── */
+  --duration-instant: 90ms;   /* <100ms shimmer/press ack */
+  --duration-fast:    150ms;  /* hover / small state */
+  --duration-base:    220ms;  /* standard transition */
+  --duration-slow:    320ms;  /* panel / trace segment reveal */
+  --duration-slower:  520ms;  /* full signal-path trace choreography */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);   /* entering */
+  --ease-in:     cubic-bezier(0.7, 0, 0.84, 0);   /* exiting (faster) */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: linear(0, 0.006, 0.025 2.8%, 0.101 6.1%, 0.539 18.9%, 0.721 25.3%, 0.849 31.5%, 0.937 38.1%, 0.968 41.8%, 0.991 45.7%, 1.006 50.1%, 1.015 55%, 1.017 63.9%, 1.001);
+  --stagger-step: 45ms; /* per cable segment / margin note in the trace */
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   [MARGINALIA OVERRIDE] — accent + display flourish (siblings replace THIS block)
+   Accent = "Rubric" vermilion (hue 40), 11-step OKLCH, working center
+   oklch(0.66 0.19 40) at step 500. From rubrication, the red-ink margin annotation
+   that IS marginalia; the accent draws the citation thread from claim to source.
+   Danger shifts cooler/darker (hue ~22) so rubric never reads as failure — hue is
+   NOT a safe separator here (~18deg apart), so lightness + chroma carry the
+   distinction and a deuteranopia/protanopia check is a required Design-Loop step-5
+   task (accent-400 vs danger-400).
+   ───────────────────────────────────────────────────────────────────────── */
+@theme static {
+  --color-accent-50:  oklch(0.965 0.020 40);
+  --color-accent-100: oklch(0.925 0.040 40);
+  --color-accent-200: oklch(0.870 0.075 40);
+  --color-accent-300: oklch(0.800 0.120 40);
+  --color-accent-400: oklch(0.730 0.165 40); /* on-dark accent / citation thread */
+  --color-accent-500: oklch(0.660 0.190 40); /* working center (brief) */
+  --color-accent-600: oklch(0.585 0.175 40);
+  --color-accent-700: oklch(0.505 0.148 40);
+  --color-accent-800: oklch(0.425 0.118 40);
+  --color-accent-900: oklch(0.345 0.088 40);
+  --color-accent-950: oklch(0.278 0.066 40);
+
+  /* Danger — cooler + darker than rubric (hue 22), so error highlights are separable
+     from the citation thread by lightness/chroma, not hue. */
+  --color-danger-400:  oklch(0.670 0.155 22);
+  --color-danger-600:  oklch(0.505 0.185 22);
+
+  /* Reading-column face — the annotated manuscript page. A transitional serif with
+     genuine character for the answer body ONLY (never UI chrome); UI/data stay on the
+     Geist pairing. Self-hosted woff2 vendored at the Phase 2 SPA build (DESIGN.md). */
+  --font-reading: "Source Serif 4", "Source Serif 4 Fallback", Georgia, "Times New Roman", serif;
+
+  /* Annotated-page metrics — the display flourish made into tokens. */
+  --measure-reading: 66ch;   /* answer reading column, 60-70ch (brief) */
+  --measure-margin:  16rem;  /* right-margin note gutter at >=1024px */
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Semantic tier — purpose-named aliases. DARK-FIRST defaults live in :root.
+   Kept as live var() references so the light remap below re-themes everything.
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+
+  /* Surfaces & structure */
+  --color-bg:            var(--color-neutral-950);
+  --color-surface-1:     var(--color-neutral-900);
+  --color-surface-2:     var(--color-neutral-800);
+  --color-border:        var(--color-neutral-800);
+  --color-border-strong: var(--color-neutral-700);
+
+  /* Text */
+  --color-text-1: var(--color-neutral-50);   /* primary   */
+  --color-text-2: var(--color-neutral-300);  /* secondary */
+  --color-text-3: var(--color-neutral-400);  /* tertiary / meta */
+
+  /* Brand / accent (Rubric vermilion) */
+  --color-primary:        var(--color-accent-400); /* fill / citation thread */
+  --color-primary-strong: var(--color-accent-300);
+  --color-accent-text:    var(--color-accent-300); /* accent AS TEXT on bg (links) */
+  --color-on-primary:     var(--color-neutral-950); /* text on the vermilion fill */
+
+  /* Annotated-page semantics — the display flourish */
+  --color-citation-thread:  var(--color-accent-400); /* the cable claim -> margin note */
+  --color-margin-note-bg:   var(--color-surface-1);
+  --color-margin-note-brd:  var(--color-accent-900);
+  /* Audit-panel passage highlight — low-alpha vermilion sweep (never a solid fill). */
+  --color-highlight:        oklch(0.730 0.165 40 / 0.22);
+
+  /* Status (text-safe on bg for the active mode) */
+  --color-success: var(--color-success-400);
+  --color-danger:  var(--color-danger-400);
+  --color-warning: var(--color-warning-400);
+  --color-info:    var(--color-info-400);
+
+  /* Effects — the vermilion citation-thread glow (active cable / focus). */
+  --glow-signal:   0 0 0 1px oklch(0.730 0.165 40 / 0.55), 0 0 14px oklch(0.730 0.165 40 / 0.35);
+  --ring-focus:    0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-primary);
+}
+
+/* Light remap — a token remap only (real light mode, not inverted darks). */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --color-bg:            var(--color-neutral-50);
+  --color-surface-1:     oklch(1 0 0);
+  --color-surface-2:     var(--color-neutral-100);
+  --color-border:        var(--color-neutral-200);
+  --color-border-strong: var(--color-neutral-300);
+
+  --color-text-1: var(--color-neutral-950);
+  --color-text-2: var(--color-neutral-700);
+  --color-text-3: var(--color-neutral-600);
+
+  --color-primary:        var(--color-accent-600);
+  --color-primary-strong: var(--color-accent-700);
+  --color-accent-text:    var(--color-accent-700); /* darker vermilion for AA text on white */
+  --color-on-primary:     oklch(1 0 0);            /* white text on the darker vermilion fill */
+
+  --color-citation-thread:  var(--color-accent-600);
+  --color-margin-note-bg:   var(--color-neutral-50);
+  --color-margin-note-brd:  var(--color-accent-200);
+  --color-highlight:        oklch(0.660 0.190 40 / 0.16);
+
+  --color-success: var(--color-success-600);
+  --color-danger:  var(--color-danger-600);
+  --color-warning: var(--color-warning-600);
+  --color-info:    var(--color-info-600);
+
+  --ring-focus:    0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-primary);
+}
+
+/* Honor OS preference when no explicit data-theme is set. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]):not([data-theme="light"]) {
+    color-scheme: light;
+    --color-bg:            var(--color-neutral-50);
+    --color-surface-1:     oklch(1 0 0);
+    --color-surface-2:     var(--color-neutral-100);
+    --color-border:        var(--color-neutral-200);
+    --color-border-strong: var(--color-neutral-300);
+    --color-text-1: var(--color-neutral-950);
+    --color-text-2: var(--color-neutral-700);
+    --color-text-3: var(--color-neutral-600);
+    --color-primary:        var(--color-accent-600);
+    --color-primary-strong: var(--color-accent-700);
+    --color-accent-text:    var(--color-accent-700);
+    --color-on-primary:     oklch(1 0 0);
+    --color-citation-thread:  var(--color-accent-600);
+    --color-margin-note-bg:   var(--color-neutral-50);
+    --color-margin-note-brd:  var(--color-accent-200);
+    --color-highlight:        oklch(0.660 0.190 40 / 0.16);
+    --color-success: var(--color-success-600);
+    --color-danger:  var(--color-danger-600);
+    --color-warning: var(--color-warning-600);
+    --color-info:    var(--color-info-600);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Chart palette — the public eval tab (dataviz-system rules). Categorical series
+   1 = the Rubric accent so eval charts read as one system with the demo. Max 6,
+   hue-separated >=45deg + lightness stagger for CVD safety.
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  --chart-cat-1: oklch(0.720 0.170 40);  /* vermilion — hybrid / primary series */
+  --chart-cat-2: oklch(0.780 0.120 205); /* cyan   — dense lane */
+  --chart-cat-3: oklch(0.800 0.150 155); /* green  — BM25 lane */
+  --chart-cat-4: oklch(0.820 0.140 90);  /* amber  */
+  --chart-cat-5: oklch(0.680 0.150 285); /* violet */
+  --chart-cat-6: oklch(0.700 0.150 330); /* magenta */
+  /* Sequential (single-hue vermilion intensity) — heatmaps / density. */
+  --chart-seq-1: oklch(0.930 0.030 40);
+  --chart-seq-2: oklch(0.850 0.075 40);
+  --chart-seq-3: oklch(0.760 0.140 40);
+  --chart-seq-4: oklch(0.650 0.180 40);
+  --chart-seq-5: oklch(0.520 0.150 40);
+  /* Diverging (below-target vermilion <- neutral -> above-target cyan). */
+  --chart-div-neg: oklch(0.700 0.170 40);
+  --chart-div-mid: oklch(0.585 0.014 240);
+  --chart-div-pos: oklch(0.720 0.132 205);
+  --chart-grid:    oklch(0.290 0.013 240); /* low-contrast gridlines */
+}
+
+/* Expose semantic aliases to Tailwind utilities (bg-bg, text-text-1, etc.).
+   These reference the live :root vars above so utilities re-theme with them. */
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface-1: var(--color-surface-1);
+  --color-surface-2: var(--color-surface-2);
+  --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+  --color-text-1: var(--color-text-1);
+  --color-text-2: var(--color-text-2);
+  --color-text-3: var(--color-text-3);
+  --color-primary: var(--color-primary);
+  --color-primary-strong: var(--color-primary-strong);
+  --color-accent-text: var(--color-accent-text);
+  --color-on-primary: var(--color-on-primary);
+  --color-citation-thread: var(--color-citation-thread);
+  --color-success: var(--color-success);
+  --color-danger: var(--color-danger);
+  --color-warning: var(--color-warning);
+  --color-info: var(--color-info);
+}
+
+/* Reduced motion — collapse every animation/transition (incl. the trace). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

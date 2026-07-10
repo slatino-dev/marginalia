@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Marginalia — Signal Path token sheet (Rubric)</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2626201d'/%3E%3Cpath d='M9 7v18' stroke='%23e0552f' stroke-width='2.5' stroke-linecap='round'/%3E%3Ccircle cx='23' cy='12' r='3' fill='%23e0552f'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/tokens.css" />
+    <style>
+      /* Token sheet is a PROOF surface (Design Loop step 3), not a shipped component.
+         It consumes semantic tokens via var(--color-*) only — no raw hex here. The
+         Phase 2 React SPA (annotated manuscript page + retrieval schematic) replaces it. */
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--color-bg);
+        color: var(--color-text-1);
+        font-family: var(--font-body);
+        line-height: 1.6;
+        padding: calc(var(--spacing) * 8);
+      }
+      h1, h2 { font-family: var(--font-display); letter-spacing: var(--tracking-tight); margin: 0; }
+      h1 { font-size: var(--text-3xl); }
+      h2 {
+        font-size: var(--text-sm); text-transform: uppercase;
+        letter-spacing: var(--tracking-label); color: var(--color-text-3);
+        font-family: var(--font-mono); font-weight: 500;
+        margin: calc(var(--spacing) * 9) 0 calc(var(--spacing) * 3);
+        padding-bottom: calc(var(--spacing) * 2);
+        border-bottom: 1px solid var(--color-border);
+      }
+      .mono { font-family: var(--font-mono); }
+      header {
+        display: flex; align-items: baseline; gap: calc(var(--spacing) * 4);
+        justify-content: space-between; flex-wrap: wrap;
+      }
+      .sub { color: var(--color-text-2); font-size: var(--text-sm); max-width: 65ch; }
+      .toggle {
+        font-family: var(--font-mono); font-size: var(--text-sm);
+        background: var(--color-surface-2); color: var(--color-text-1);
+        border: 1px solid var(--color-border-strong); border-radius: var(--radius-md);
+        padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3); cursor: pointer;
+        transition: box-shadow var(--duration-fast) var(--ease-out);
+      }
+      .toggle:focus-visible { outline: none; box-shadow: var(--ring-focus); }
+      .row { display: flex; flex-wrap: wrap; gap: calc(var(--spacing) * 2); }
+      .swatch {
+        width: 84px; border-radius: var(--radius-sm); overflow: hidden;
+        border: 1px solid var(--color-border); font-size: 11px;
+      }
+      .swatch .chip { height: 44px; }
+      .swatch .lbl {
+        padding: 4px 6px; background: var(--color-surface-1);
+        color: var(--color-text-3); font-family: var(--font-mono);
+      }
+      .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: calc(var(--spacing) * 4); }
+      .card {
+        background: var(--color-surface-1); border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg); padding: calc(var(--spacing) * 4); box-shadow: var(--shadow-2);
+      }
+      .pill {
+        display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono);
+        font-size: var(--text-xs); padding: 3px 9px; border-radius: var(--radius-pill);
+      }
+      /* The annotated-page flourish, shown in miniature: a reading column with a
+         vermilion citation thread running to a right-margin note. */
+      .page {
+        display: grid; grid-template-columns: minmax(0, var(--measure-reading)) var(--measure-margin);
+        gap: calc(var(--spacing) * 6); align-items: start; margin-top: calc(var(--spacing) * 3);
+      }
+      .reading { font-family: var(--font-reading); font-size: var(--text-lg); color: var(--color-text-1); }
+      .claim {
+        border-bottom: 2px solid var(--color-citation-thread);
+        box-shadow: 0 2px 0 -1px var(--color-citation-thread);
+      }
+      .marker {
+        font-family: var(--font-mono); font-size: var(--text-xs); vertical-align: super;
+        color: var(--color-on-primary); background: var(--color-primary);
+        border-radius: var(--radius-xs); padding: 0 4px; margin-left: 2px;
+      }
+      .note {
+        font-family: var(--font-body); font-size: var(--text-sm); color: var(--color-text-2);
+        background: var(--color-margin-note-bg); border: 1px solid var(--color-margin-note-brd);
+        border-left: 3px solid var(--color-citation-thread);
+        border-radius: var(--radius-md); padding: calc(var(--spacing) * 3);
+      }
+      .hl { background: var(--color-highlight); border-radius: var(--radius-xs); padding: 0 2px; }
+      @media (max-width: 1023px) { .page { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Marginalia</h1>
+        <p class="sub">
+          Signal Path token sheet, Rubric override. Proof surface for the design system
+          (Design Loop step 3). The accent is vermilion, hue 40, from rubrication: the
+          red-ink margin annotation that is marginalia. Every value here resolves to a
+          semantic token in <span class="mono">src/styles/theme.css</span>.
+        </p>
+      </div>
+      <button class="toggle" id="theme-toggle" type="button" aria-label="Toggle light and dark theme">
+        toggle theme
+      </button>
+    </header>
+
+    <h2>Accent — Rubric vermilion (hue 40)</h2>
+    <div class="row" id="accent"></div>
+
+    <h2>Neutral slate (hue 240)</h2>
+    <div class="row" id="neutral"></div>
+
+    <h2>Status — success / danger (cooler, hue 22) / warning / info</h2>
+    <div class="row" id="status"></div>
+
+    <h2>The annotated page — display flourish</h2>
+    <div class="page">
+      <p class="reading">
+        The <span class="claim">O-ring seals in the solid rocket boosters were not
+        designed to accommodate the low temperatures<span class="marker">1</span></span>
+        present at launch, and the resulting loss of sealing capability was the direct
+        physical cause of the failure.
+      </p>
+      <aside class="note">
+        <strong>Source 1</strong> — Rogers Commission Report, Ch. IV.<br />
+        <span class="hl">"a serious flaw in the design of the seal"</span>
+        <div class="mono" style="color: var(--color-text-3); margin-top: 6px;">bm25 -8.42 · dense 0.71 · rerank 0.93</div>
+      </aside>
+    </div>
+
+    <h2>Radii · shadows</h2>
+    <div class="cards" id="scales"></div>
+
+    <script>
+      // Token-sheet rendering only. No app logic; the SPA (Phase 2) ships React.
+      const swatch = (name, varName) =>
+        `<div class="swatch"><div class="chip" style="background:var(${varName})"></div><div class="lbl">${name}</div></div>`;
+      const steps = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+      document.getElementById("accent").innerHTML = steps
+        .map((s) => swatch(s, `--color-accent-${s}`))
+        .join("");
+      document.getElementById("neutral").innerHTML = steps
+        .map((s) => swatch(s, `--color-neutral-${s}`))
+        .join("");
+      document.getElementById("status").innerHTML = ["success", "danger", "warning", "info"]
+        .map((n) => swatch(n, `--color-${n}`))
+        .join("");
+      const radii = ["xs", "sm", "md", "lg", "xl"];
+      document.getElementById("scales").innerHTML = radii
+        .map(
+          (r) =>
+            `<div class="card"><div style="height:40px;background:var(--color-surface-2);border:1px solid var(--color-border-strong);border-radius:var(--radius-${r})"></div><div class="mono" style="margin-top:8px;color:var(--color-text-3)">--radius-${r}</div></div>`,
+        )
+        .join("");
+      const btn = document.getElementById("theme-toggle");
+      btn.addEventListener("click", () => {
+        const root = document.documentElement;
+        root.setAttribute("data-theme", root.getAttribute("data-theme") === "dark" ? "light" : "dark");
+      });
+    </script>
+  </body>
+</html>

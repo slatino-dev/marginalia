@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Cloudflare / Wrangler local state
+.wrangler/
+.dev.vars
+dist/
+
+# Local secrets (only the .example is committed)
+*.local
+
+# Test / build artifacts
+coverage/
+*.tsbuildinfo
+
+# Offline ingest working cache — fetched source PDFs and extracted text are NOT
+# committed (the pinned sources + sha256s live in docs/corpus-dossier.md, and the
+# ingest pipeline re-fetches from the allow-list). See ARCHITECTURE ingest notes.
+ingest/cache/
+.corpus-cache/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
